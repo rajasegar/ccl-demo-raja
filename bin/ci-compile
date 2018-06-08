@@ -3,7 +3,7 @@
 CL_IMPL=ccl-bin
 
 apt-get update
-apt-get install -y build-essential git
+apt-get install -y autoconf build-essential git libcurl4-openssl-dev
 
 git clone -b release https://github.com/roswell/roswell.git
 pushd roswell || exit
