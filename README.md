@@ -16,7 +16,6 @@ This application is a forked and highly modified version of [bhyde](https://gith
 1. Use modern Common Lisp tooling (in particular, [Roswell](https://github.com/roswell/roswell) and [QuickLisp](http://www.quicklisp.org/)).
 2. Use CI and linting to prevent bit-rot and avoidable bugs.
 3. Support the latest Heroku stack (currently [heroku-18](https://devcenter.heroku.com/articles/heroku-18-stack)).
-4. Support any common Common Lisp implementations (currently any supported by Roswell).
 
 ## licence
 heroku-app-clozure-common-lisp is licensed under the GNU Lesser General Public License.
