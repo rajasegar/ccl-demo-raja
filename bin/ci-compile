@@ -2,6 +2,9 @@
 
 CL_IMPL=ccl-bin
 
+apt-get update
+apg-get install build-essential git
+
 git clone -b release https://github.com/roswell/roswell.git
 pushd roswell || exit
 sh bootstrap
