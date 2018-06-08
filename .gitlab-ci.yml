@@ -2,6 +2,6 @@ image: debian
 shellcheck:
   script:
     - ./bin/ci-shellcheck
-test_compile:
+compile:
   script:
-    - ./bin/ci-test-compile
+    - ./bin/ci-compile
