@@ -1,5 +1,5 @@
-(asdf:defsystem #:heroku-app-common-lisp
-  :description "Describe heroku-app-common-lisp here"
+(asdf:defsystem #:heroku-app-clozure-common-lisp
+  :description "Describe heroku-app-clozure-common-lisp here"
   :author "Duncan Bayne"
   :license  "GNU Lesser Public License 3.0"
   :version "0.0.1"

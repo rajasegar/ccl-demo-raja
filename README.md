@@ -1,7 +1,7 @@
 # Heroku App for Common Lisp
 
 <!-- TODO: duncan@bayne.id.au: Fix use of postimg once https://gitlab.com/gitlab-org/gitlab-ce/issues/17987 is resolved. -->
-[![pipeline status](https://gitlab.com/duncan-bayne/heroku-app-common-lisp/badges/master/pipeline.svg)](https://gitlab.com/duncan-bayne/heroku-app-common-lisp/commits/master) ![lisp logo](https://s22.postimg.cc/rhfrsvgwh/lisp-lizard-with-text.png)
+[![pipeline status](https://gitlab.com/duncan-bayne/heroku-app-clozure-common-lisp/badges/master/pipeline.svg)](https://gitlab.com/duncan-bayne/heroku-app-clozure-common-lisp/commits/master) ![lisp logo](https://s22.postimg.cc/rhfrsvgwh/lisp-lizard-with-text.png)
 
 This is a template Common Lisp application for deployment with the [heroku-buildpack-common-lisp](https://gitlab.com/duncan-bayne/heroku-buildpack-common-lisp) buildpack.
 
@@ -19,7 +19,7 @@ This application is a forked and highly modified version of [bhyde](https://gith
 4. Support any common Common Lisp implementations (currently any supported by Roswell).
 
 ## licence
-heroku-app-common-lisp is licensed under the GNU Lesser General Public License.
+heroku-app-clozure-common-lisp is licensed under the GNU Lesser General Public License.
 
 ### why the LGPL?
 The GPL is specifically designed to reduce the usefulness of GPL-licensed code to closed-source, proprietary software. The BSD license (and similar) do not mandate code-sharing if the BSD-licensed code is modified by licensees. The LGPL achieves the best of both worlds: an LGPL-licensed library can be incorporated within closed-source proprietary code, and yet those using an LGPL-licensed library are required to release source code to that library if they change it.

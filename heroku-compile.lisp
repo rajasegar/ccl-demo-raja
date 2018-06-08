@@ -1,2 +1,1 @@
-;; TODO: duncan@bayne.id.au: HACK: fix this
-(ql:quickload :heroku-app-common-lisp)
+(ql:quickload :heroku-app-clozure-common-lisp)
