@@ -1,4 +1,5 @@
-(in-package #:heroku-app-common-lisp)
+;; TODO: duncan@bayne.id.au: make the Buildpack aware of the app package name
+(in-package #:cl-user)
 
 (hunchentoot:define-easy-handler (root :uri "/") ()
   (cl-who:with-html-output-to-string (s nil :prologue t)
