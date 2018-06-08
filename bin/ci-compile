@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+CL_IMPL=ccl-bin
+
+git clone -b release https://github.com/roswell/roswell.git
+pushd roswell || exit
+sh bootstrap
+./configure --prefix ~/.local/
+make
+make install
+export PATH=$PATH:~/.local/bin/
+ros setup
+ros install "$CL_IMPL"
+ros use "$CL_IMPL"
+popd || exit
+
+ros run --asdf --eval '(load "heroku-compile.lisp") (initialize-application :port 5432)' --quit
