@@ -5,6 +5,9 @@
 
 This is a template Clozure Common Lisp application for deployment with the [heroku-buildpack-common-lisp](https://gitlab.com/duncan-bayne/heroku-buildpack-common-lisp) buildpack.
 
+<!-- TODO: duncan@bayne.id.au: Fix use of postimg once https://gitlab.com/gitlab-org/gitlab-ce/issues/17987 is resolved. -->
+[![webapp screenshot](https://s33.postimg.cc/nqliwvlnz/Screen_Shot_2018-06-08_at_12.18.28.png)]
+
 ## development
 
 ### history
