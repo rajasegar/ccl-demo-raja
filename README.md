@@ -1,7 +1,6 @@
 # Heroku App for Common Lisp
 
-<!-- TODO: duncan@bayne.id.au: Fix use of postimg once https://gitlab.com/gitlab-org/gitlab-ce/issues/17987 is resolved. -->
-[![pipeline status](https://gitlab.com/duncan-bayne/heroku-app-clozure-common-lisp/badges/master/pipeline.svg)](https://gitlab.com/duncan-bayne/heroku-app-clozure-common-lisp/commits/master) [![lisp logo](https://s22.postimg.cc/rhfrsvgwh/lisp-lizard-with-text.png)](http://lisp-lang.org/)
+[![pipeline status](https://gitlab.com/duncan-bayne/heroku-app-clozure-common-lisp/badges/master/pipeline.svg)](https://gitlab.com/duncan-bayne/heroku-app-clozure-common-lisp/commits/master) [![lisp logo](./static/lisp-logo120x80.png)](http://lisp-lang.org/)
 
 This is a template Clozure Common Lisp application for deployment with the [heroku-buildpack-common-lisp](https://gitlab.com/duncan-bayne/heroku-buildpack-common-lisp) buildpack.
 
