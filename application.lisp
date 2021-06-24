@@ -1,25 +1,33 @@
-;; TODO: duncan@bayne.id.au: make the Buildpack aware of the app package name
 (in-package #:cl-user)
-(djula:add-template-directory (asdf:system-relative-pathname "heroku-app-clozure-common-lisp" "templates/"))
 
-(defparameter +about.html+ (djula:compile-template* "about.html"))
-
-
+(defmacro demo-page ((&key title script) &body body)
+  `(cl-who:with-html-output-to-string
+       (*standard-output* nil :prologue t :indent t)
+     (:html :lang "en"
+	    (:head
+	     (:meta :charset "utf-8")
+	     (:title, title))
+	    (:body
+	     (:nav
+	      (:ul
+	       (:li (:a :href "/" "Home"))
+	       (:li (:a :href "/about" "About"))
+	       (:li (:a :href "/contact" "Contact"))))
+	     (:div :class "container"
+		   (:h1 "Demo page")
+		   ,@body)))))
 
 (easy-routes:defroute about ("/about" :method :get) ()
-  (djula:render-template* +about.html+ nil 
-                        :title "Ukeleles"
-                        :project-name "Ukeleles"
-                        :mode "welcome"))
+  (demo-page (:title "About")
+	     (:h1 "About page")))
 
+(easy-routes:defroute contact ("/contact" :method :get) ()
+  (demo-page (:title "Contact")
+	     (:h1 "Contact page")))
 
 (easy-routes:defroute root ("/" :method :get) ()
-  (cl-who:with-html-output-to-string (s nil :prologue t)
-    (:html
-      (:body
-        (:p "Hello, World!")
-	(:p (:a :href "/about" "About"))
-        (:img :src "/lisp-logo120x80.png")))))
+  (demo-page (:title "Home")
+    (:h1 "Home")))
 
 
 (defvar *acceptor* nil)
