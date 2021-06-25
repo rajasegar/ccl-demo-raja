@@ -1,15 +1,154 @@
-* {
-    margin: 0;
-    padding: 0;
-    border: none;
+@charset "UTF-8";
+
+:root {
+  --color-primary: #011627;
+    --color-secondary: #8b8c8a;
+    --color-danger: #e71d36;
+    --color-warning: #ff9f1c;
+    --color-info: #2ec4b6;
+    --color-background: #182b3a;
+    --color-black: #171817;
+    --color-overlay: rgba(253, 255, 252, 0.8);
+    --color-ember: #e04e39;
+    --color-burnt-ember: #9b2918;
+    --color-ember-white: #fdfdfd;
+    --color-white: #fff;
 }
 
+* {
+  margin:0;
+  padding:0;
+  border: none;
+}
+
+body {
+  font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;
+  background: var(--color-ember);
+}
+
+a {
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+nav {
+  border-bottom: 10px solid var(--color-ember);
+}
 nav ul {
-    display: flex;
+  display:flex;
+  background: var(--color-burnt-ember);
+  align-items:start;
+}
+
+li {
+  list-style: none;
 }
 
 nav ul li {
-    list-style: none;
-    margin: 1em;
+  height: 3em;
+}
+
+nav a, nav span {
+  padding: 1em;
+  line-height:3em;
+}
+
+nav a.active, nav a:hover {
+  background: var(--color-ember);
+  color: var(--color-white);
+}
+
+#main {
+  text-align: center;
+}
+.list a {
+  cursor: pointer;
+  padding:0.5em 1em;
+  display: block;
+}
+
+.list a:hover {
+  background: var(--color-burnt-ember);
+}
+
+.list a.active {
+  background: var(--color-white);
+  color: var(--color-ember);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+}
+
+.left-panel {
+}
+
+.right-panel {
+  padding: 1em;
+  background: var(--color-white);
+  color: var(--color-ember);
+  /*height: 100vh;*/
+}
+
+.right-panel a {
+  color: var(--color-ember);
+}
+
+table td {
+  padding: .5em;
+}
+
+table tr td:nth-child(1) {
+  font-weight: bold;
+  color: var(--color-burnt-ember);
+}
+
+table tr::odd {
+  background: var(--color-burnt-ember);
+}
+
+table tr:even {
+  background: var(--color-ember);
+}
+
+table a {
+  text-decoration: underline;
+  cursor: pointer;
+  padding:.25em;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vh;
+  height: 100%;
+}
+
+.search-wrapper label {
+  margin-left: 1em;
+}
+
+.search-box {
+  display: grid;
+  grid-template-columns: 240px 42px;
+}
+
+.search-field {
     padding: 1em;
+    width: 240px;
+    margin-left: 1em;
+    border-radius: .25em;
+    margin-bottom: 1em;
+}
+
+.clear-button {
+  float: right;
+  font-size: 1.5em;
+  height: 42px;
+  width: 42px;
+  border-radius: .25em;
+  cursor: pointer;
+  color: var(--color-burnt-ember);
 }

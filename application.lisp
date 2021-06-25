@@ -29,7 +29,9 @@
 
 (hunchentoot:define-easy-handler (root :uri "/") ()
   (demo-page (:title "Home")
-    (:h1 "Home")))
+    (:h1 "Home")
+    (:p "This is swapi demo")
+    ))
 
 ;; Publish all static content.
 (push (hunchentoot:create-static-file-dispatcher-and-handler "/styles.css" "static/styles.css") hunchentoot:*dispatch-table*)
@@ -38,10 +40,10 @@
 (defvar *acceptor* nil)
 
 (defun initialize-application (&key port)
-  (setf hunchentoot:*dispatch-table*
-    `(hunchentoot:dispatch-easy-handlers
-       ,(hunchentoot:create-folder-dispatcher-and-handler
-          "/" "/app/static/")))
+  ;; (setf hunchentoot:*dispatch-table*
+  ;;   `(hunchentoot:dispatch-easy-handlers
+  ;;      ,(hunchentoot:create-folder-dispatcher-and-handler
+  ;;         "/" "/app/static/")))
 
   (when *acceptor*
     (hunchentoot:stop *acceptor*))
