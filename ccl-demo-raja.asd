@@ -1,5 +1,5 @@
-(asdf:defsystem #:heroku-app-clozure-common-lisp
-  :description "Describe heroku-app-clozure-common-lisp here"
+(asdf:defsystem #:ccl-demo-raja
+  :description "Describe ccl-demo-raja here"
   :author "Duncan Bayne"
   :license  "GNU Lesser Public License 3.0"
   :version "0.0.1"

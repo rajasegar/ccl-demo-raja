@@ -1,1 +1,1 @@
-(ql:quickload :heroku-app-clozure-common-lisp)
+(ql:quickload :ccl-demo-raja)

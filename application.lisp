@@ -1,12 +1,14 @@
 (in-package #:cl-user)
 
-(defmacro demo-page ((&key title script) &body body)
+(defmacro demo-page ((&key title) &body body)
   `(cl-who:with-html-output-to-string
        (*standard-output* nil :prologue t :indent t)
      (:html :lang "en"
 	    (:head
 	     (:meta :charset "utf-8")
-	     (:title, title))
+	     (:title, title)
+	     (:link :href "styles.css" :rel "stylesheet")
+	     )
 	    (:body
 	     (:nav
 	      (:ul
@@ -17,17 +19,20 @@
 		   (:h1 "Demo page")
 		   ,@body)))))
 
-(easy-routes:defroute about ("/about" :method :get) ()
+(hunchentoot:define-easy-handler (about :uri "/about") ()
   (demo-page (:title "About")
 	     (:h1 "About page")))
 
-(easy-routes:defroute contact ("/contact" :method :get) ()
+(hunchentoot:define-easy-handler (contact :uri "/contact") ()
   (demo-page (:title "Contact")
 	     (:h1 "Contact page")))
 
-(easy-routes:defroute root ("/" :method :get) ()
+(hunchentoot:define-easy-handler (root :uri "/") ()
   (demo-page (:title "Home")
     (:h1 "Home")))
+
+;; Publish all static content.
+(push (hunchentoot:create-static-file-dispatcher-and-handler "/styles.css" "static/styles.css") hunchentoot:*dispatch-table*)
 
 
 (defvar *acceptor* nil)
@@ -36,10 +41,10 @@
   (setf hunchentoot:*dispatch-table*
     `(hunchentoot:dispatch-easy-handlers
        ,(hunchentoot:create-folder-dispatcher-and-handler
-          "/" "/static/")))
+          "/" "/app/static/")))
 
   (when *acceptor*
     (hunchentoot:stop *acceptor*))
 
   (setf *acceptor*
-    (hunchentoot:start (make-instance 'easy-routes:easy-routes-acceptor :port port))))
+    (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port port))))

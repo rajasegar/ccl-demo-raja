@@ -1,2 +1,2 @@
-(defpackage #:heroku-app-clozure-common-lisp
+(defpackage #:ccl-demo-raja
   (:use #:cl))
