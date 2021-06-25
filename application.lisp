@@ -13,13 +13,33 @@
 	     (:title, title)
 	     (:link :href "/styles.css" :rel "stylesheet")
 	     )
-	    (:body
+	    (:body :hx-boost "true"
 	     (:nav
 	      (:ul
 	       (:li (:a :href "/" "Star Wars"))
 	       (:li (:a :href "/people" "People"))
 	       (:li (:a :href "/planets" "Planets"))))
-	     (:main ,@body)))))
+	     (:main ,@body)
+	     (:script :src "https://unpkg.com/htmx.org@1.4.1")
+	     ))))
+
+(defmacro search-box ((&key url))
+  `(cl-who:htm
+    (:div
+     :class "search-wrapper"
+     (:label :for "search-box" "Search:")
+     (:div
+      :class "search-box"
+      (:input
+       :id "search-box"
+       :name "search"
+       :class "search-field"
+       :type "text"
+       :hx-post, url 
+       :hx-trigger "keyup changed delay:500ms"
+       :hx-target "#search-results"
+       :hx-indicator ".htmx-indicator")))
+    (:div :id "loading-search" :class "htmx-indicator" "Loading...")))
 
 
 ;; People show page
@@ -34,7 +54,9 @@
 (:div :class "grid"
 	  (:div
 	   :class "left-panel"
+	   (search-box (:url "/people/search"))
 	   (:ul
+	    :id "search-results"
 	    :class "list"
 		     (loop for character in (rest (assoc :results *people*))
 			   for i from 1 to 10
@@ -76,7 +98,9 @@
 (:div :class "grid"
 	  (:div
 	   :class "left-panel"
+	   (search-box (:url "/people/search"))
 	   (:ul
+	    :id "search-results"
 	    :class "list"
 		     (loop for character in (rest (assoc :results *people*))
 			   for i from 1 to 10
@@ -90,19 +114,12 @@
 	   (:h2 "Please select a character")))))
 
 
-(defmacro get-prop ((&key prop obj))
-  `(cl-who:str (cdr (assoc ,@prop ,@obj))))
 
-;; Planets page
-(hunchentoot:define-easy-handler (planets :uri "/planets") (id)
+;; Planets show page
+(hunchentoot:define-easy-handler (planets-show :uri "/planets/show") (id)
   (format t "ID: ~a~%" id)
   (setq *planet* (cl-json:decode-json-from-string
 		   (drakma:http-request (concatenate 'string "https://swapi.dev/api/planets/" id)
-					:method :get
-					)))
-
-  (setq *planets* (cl-json:decode-json-from-string
-		   (drakma:http-request "https://swapi.dev/api/planets/"
 					:method :get
 					)))
 
@@ -110,14 +127,15 @@
     (:div :class "grid"
 	  (:div
 	   :class "left-panel"
-	   (:ul
+	   (search-box (:url "/planets/search"))
+	   (:ul :id "search-results"
 	    :class "list"
 		     (loop for planet in (rest (assoc :results *planets*))
 			   for i from 1 to 10
 			   do (cl-who:htm
 			       (:li
 				(:a
-				 :href (concatenate 'string "/planets?id=" (write-to-string i))
+				 :href (concatenate 'string "/planets/show?id=" (write-to-string i))
 				 (cl-who:str (cdr (assoc :name planet)))))))))
 	  (:div
 	   :class "right-panel"
@@ -137,12 +155,69 @@
 		      (:tr (:td "Films:") (:td (cl-who:str (cdr (assoc :films *planet*)))))))
 		    (cl-who:htm (:h2 "Please select a planet")))))))
 
+
+;; Planets page
+(hunchentoot:define-easy-handler (planets :uri "/planets") ()
+  
+  (setq *planets* (cl-json:decode-json-from-string
+		   (drakma:http-request "https://swapi.dev/api/planets/"
+					:method :get
+					)))
+
+  (demo-page (:title "Planets - Star Wars")
+    (:div :class "grid"
+	  (:div
+	   :class "left-panel"
+	   (search-box (:url "/planets/search"))
+	   (:ul :id "search-results"
+	    :class "list"
+		     (loop for planet in (rest (assoc :results *planets*))
+			   for i from 1 to 10
+			   do (cl-who:htm
+			       (:li
+				(:a
+				 :href (concatenate 'string "/planets/show?id=" (write-to-string i))
+				 (cl-who:str (cdr (assoc :name planet)))))))))
+	  (:div
+	   :class "right-panel"
+	   (:h2 "Please select a planet.")))))
+
 ;; Home page
 (hunchentoot:define-easy-handler (root :uri "/") ()
   (demo-page (:title "Star Wars - Common Lisp demo")
     (:h1 "Home")
     (:p "This is a Starwars demo swapi demo")
     ))
+
+;; Search page - people
+(hunchentoot:define-easy-handler (search-people :uri "/people/search") (search)
+(setq *search-results* (cl-json:decode-json-from-string
+		   (drakma:http-request (concatenate 'string "https://swapi.dev/api/people/?search=" search)
+					:method :get
+					)))
+  (format t "~a~%" *search-results*)
+  (cl-who:with-html-output-to-string (output nil :prologue nil)
+    (loop for p in (rest (assoc :results *search-results*))
+	  do
+	    ;; (format t "~a~%" (cl-ppcre:scan-to-strings "[0-9]+" (cdr (assoc :url p))))
+	     (cl-who:htm (:li
+			  (:a :href (concatenate 'string "/people/show?id="  (cl-ppcre:scan-to-strings "[0-9]+" (cdr (assoc :url p))))
+			   (cl-who:str (cdr (assoc :name p)))))))))
+
+;; Search page - planets
+(hunchentoot:define-easy-handler (search-planets :uri "/planets/search") (search)
+(setq *search-results* (cl-json:decode-json-from-string
+		   (drakma:http-request (concatenate 'string "https://swapi.dev/api/planets/?search=" search)
+					:method :get
+					)))
+  (format t "~a~%" *search-results*)
+  (cl-who:with-html-output-to-string (output nil :prologue nil)
+    (loop for p in (rest (assoc :results *search-results*))
+	  do
+	    ;; (format t "~a~%" (cl-ppcre:scan-to-strings "[0-9]+" (cdr (assoc :url p))))
+	     (cl-who:htm (:li
+			  (:a :href (concatenate 'string "/planets/show?id="  (cl-ppcre:scan-to-strings "[0-9]+" (cdr (assoc :url p))))
+			   (cl-who:str (cdr (assoc :name p)))))))))
 
 
 

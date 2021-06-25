@@ -60,7 +60,9 @@ nav a.active, nav a:hover {
 
 #main {
   text-align: center;
+  color: white;
 }
+
 .list a {
   cursor: pointer;
   padding:0.5em 1em;
@@ -128,6 +130,8 @@ table a {
 
 .search-wrapper label {
   margin-left: 1em;
+  color: white;
+  font-weight: bold;
 }
 
 .search-box {
@@ -151,4 +155,10 @@ table a {
   border-radius: .25em;
   cursor: pointer;
   color: var(--color-burnt-ember);
+}
+
+#loading-search {
+    text-align: center;
+    font-weight: bold;
+    color: white;
 }

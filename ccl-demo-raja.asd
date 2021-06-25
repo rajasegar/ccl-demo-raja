@@ -4,6 +4,6 @@
   :license  "GNU Lesser Public License 3.0"
   :version "0.0.1"
   :serial t
-  :depends-on (#:hunchentoot #:cl-who #:cl-json #:drakma #:easy-routes)
+  :depends-on (#:hunchentoot #:cl-who #:cl-json #:drakma #:cl-ppcre)
   :components ((:file "package")
                (:file "application")))
