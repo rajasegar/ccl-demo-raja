@@ -1,5 +1,9 @@
 (in-package #:cl-user)
 
+;; Config drakma
+(push (cons "application" "json") drakma:*text-content-types*)
+(setf drakma:*header-stream* *standard-output*)
+
 (defmacro demo-page ((&key title) &body body)
   `(cl-who:with-html-output-to-string
        (*standard-output* nil :prologue t :indent t)
@@ -7,43 +11,147 @@
 	    (:head
 	     (:meta :charset "utf-8")
 	     (:title, title)
-	     (:link :href "styles.css" :rel "stylesheet")
+	     (:link :href "/styles.css" :rel "stylesheet")
 	     )
 	    (:body
 	     (:nav
 	      (:ul
-	       (:li (:a :href "/" "Home"))
-	       (:li (:a :href "/about" "About"))
-	       (:li (:a :href "/contact" "Contact"))))
-	     (:div :class "container"
-		   (:h1 "Demo page")
-		   ,@body)))))
+	       (:li (:a :href "/" "Star Wars"))
+	       (:li (:a :href "/people" "People"))
+	       (:li (:a :href "/planets" "Planets"))))
+	     (:main ,@body)))))
 
-(hunchentoot:define-easy-handler (about :uri "/about") ()
-  (demo-page (:title "About")
-	     (:h1 "About page")))
 
-(hunchentoot:define-easy-handler (contact :uri "/contact") ()
-  (demo-page (:title "Contact")
-	     (:h1 "Contact page")))
+;; People show page
+(hunchentoot:define-easy-handler (people-show :uri "/people/show") (id)
 
+  (setq *character* (cl-json:decode-json-from-string
+		   (drakma:http-request (concatenate 'string "https://swapi.dev/api/people/" id)
+					:method :get
+					)))
+
+  (demo-page (:title "People - Star Wars")
+(:div :class "grid"
+	  (:div
+	   :class "left-panel"
+	   (:ul
+	    :class "list"
+		     (loop for character in (rest (assoc :results *people*))
+			   for i from 1 to 10
+			   do (cl-who:htm
+			       (:li
+				(:a
+				 :href (concatenate 'string "/people/show?id=" (write-to-string i))
+				 (cl-who:str (cdr (assoc :name character)))))))))
+	  (:div
+	   :class "right-panel"
+		(if (assoc :name *character*)
+		    (cl-who:htm
+		     (:h2 (cl-who:str (cdr (assoc :name *character*))))
+		     (:table
+		      (:tr (:td "Height:") (:td (cl-who:str (cdr (assoc :height *character*)))))
+		      (:tr (:td "Mass:") (:td (cl-who:str (cdr (assoc :mass *character*)))))
+		      (:tr (:td "Hair Color:") (:td (cl-who:str (cdr (assoc :hair--color *character*)))))
+		      (:tr (:td "Skin Color:") (:td (cl-who:str (cdr (assoc :skin--color *character*)))))
+		      (:tr (:td "Eye Color:") (:td (cl-who:str (cdr (assoc :eye--color *character*)))))
+		      (:tr (:td "Birth Year:") (:td (cl-who:str (cdr (assoc :birth--year *character*)))))
+		      (:tr (:td "Gender:") (:td (cl-who:str (cdr (assoc :gender *character*)))))
+		      (:tr (:td "Home world:") (:td (cl-who:str (cdr (assoc :home--world *character*)))))
+		      (:tr (:td "Films:") (:td (cl-who:str (cdr (assoc :films *character*)))))
+		      (:tr (:td "Species:") (:td (cl-who:str (cdr (assoc :species *character*)))))
+		      (:tr (:td "Vehicles:") (:td (cl-who:str (cdr (assoc :vehicles *character*)))))
+		      (:tr (:td "Starships:") (:td (cl-who:str (cdr (assoc :starships *character*)))))
+		      ))
+		    (cl-who:htm (:h2 "Please select a character")))))))
+
+
+;; People page
+(hunchentoot:define-easy-handler (people :uri "/people") ()
+
+  (setq *people* (cl-json:decode-json-from-string
+		   (drakma:http-request "https://swapi.dev/api/people/"
+					:method :get
+					)))
+  (demo-page (:title "People - Star Wars")
+(:div :class "grid"
+	  (:div
+	   :class "left-panel"
+	   (:ul
+	    :class "list"
+		     (loop for character in (rest (assoc :results *people*))
+			   for i from 1 to 10
+			   do (cl-who:htm
+			       (:li
+				(:a
+				 :href (concatenate 'string "/people/show?id=" (write-to-string i))
+				 (cl-who:str (cdr (assoc :name character)))))))))
+	  (:div
+	   :class "right-panel"
+	   (:h2 "Please select a character")))))
+
+
+(defmacro get-prop ((&key prop obj))
+  `(cl-who:str (cdr (assoc ,@prop ,@obj))))
+
+;; Planets page
+(hunchentoot:define-easy-handler (planets :uri "/planets") (id)
+  (format t "ID: ~a~%" id)
+  (setq *planet* (cl-json:decode-json-from-string
+		   (drakma:http-request (concatenate 'string "https://swapi.dev/api/planets/" id)
+					:method :get
+					)))
+
+  (setq *planets* (cl-json:decode-json-from-string
+		   (drakma:http-request "https://swapi.dev/api/planets/"
+					:method :get
+					)))
+
+  (demo-page (:title "Planets - Star Wars")
+    (:div :class "grid"
+	  (:div
+	   :class "left-panel"
+	   (:ul
+	    :class "list"
+		     (loop for planet in (rest (assoc :results *planets*))
+			   for i from 1 to 10
+			   do (cl-who:htm
+			       (:li
+				(:a
+				 :href (concatenate 'string "/planets?id=" (write-to-string i))
+				 (cl-who:str (cdr (assoc :name planet)))))))))
+	  (:div
+	   :class "right-panel"
+		(if (assoc :name *planet*)
+		    (cl-who:htm
+		     (:h2 (cl-who:str (cdr (assoc :name *planet*))))
+		     (:table
+		      (:tr (:td "Diameter:") (:td (cl-who:str (cdr (assoc :diameter *planet*)))))
+		      (:tr (:td "Rotation Period:") (:td (cl-who:str (cdr (assoc :rotation--period *planet*)))))
+		      (:tr (:td "Orbital Period:") (:td (cl-who:str (cdr (assoc :orbital--period *planet*)))))
+		      (:tr (:td "Gravity:") (:td (cl-who:str (cdr (assoc :gravity *planet*)))))
+		      (:tr (:td "Population:") (:td (cl-who:str (cdr (assoc :population *planet*)))))
+		      (:tr (:td "Climate:") (:td (cl-who:str (cdr (assoc :climate *planet*)))))
+		      (:tr (:td "Terrain:") (:td (cl-who:str (cdr (assoc :terrain *planet*)))))
+		      (:tr (:td "Surface Water:") (:td (cl-who:str (cdr (assoc :surface--water *planet*)))))
+		      (:tr (:td "Residents:") (:td (cl-who:str (cdr (assoc :residents *planet*)))))
+		      (:tr (:td "Films:") (:td (cl-who:str (cdr (assoc :films *planet*)))))))
+		    (cl-who:htm (:h2 "Please select a planet")))))))
+
+;; Home page
 (hunchentoot:define-easy-handler (root :uri "/") ()
-  (demo-page (:title "Home")
+  (demo-page (:title "Star Wars - Common Lisp demo")
     (:h1 "Home")
-    (:p "This is swapi demo")
+    (:p "This is a Starwars demo swapi demo")
     ))
 
-;; Publish all static content.
-(push (hunchentoot:create-static-file-dispatcher-and-handler "/styles.css" "static/styles.css") hunchentoot:*dispatch-table*)
 
 
 (defvar *acceptor* nil)
 
 (defun initialize-application (&key port)
-  ;; (setf hunchentoot:*dispatch-table*
-  ;;   `(hunchentoot:dispatch-easy-handlers
-  ;;      ,(hunchentoot:create-folder-dispatcher-and-handler
-  ;;         "/" "/app/static/")))
+
+    ;; Publish all static content.
+    (push (hunchentoot:create-static-file-dispatcher-and-handler "/styles.css" "static/styles.css") hunchentoot:*dispatch-table*)
 
   (when *acceptor*
     (hunchentoot:stop *acceptor*))
