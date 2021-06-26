@@ -162,3 +162,17 @@ table a {
     font-weight: bold;
     color: white;
 }
+
+.home-wrapper {
+    width: 100%;
+    text-align:center;
+    color: white;
+}
+
+.home-wrapper p {
+    margin: 1em;
+}
+
+.home-wrapper a {
+    text-decoration: underline;
+}

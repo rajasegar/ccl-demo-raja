@@ -4,7 +4,11 @@
 (push (cons "application" "json") drakma:*text-content-types*)
 (setf drakma:*header-stream* *standard-output*)
 
-(defmacro demo-page ((&key title) &body body)
+(defmacro nav-link ((&key url active) &body body)
+`(cl-who:htm
+    (:li (:a :href ,url :class (if (string= ,active ,url) "active" nil) ,@body))))
+
+(defmacro demo-page ((&key title active) &body body)
   `(cl-who:with-html-output-to-string
        (*standard-output* nil :prologue t :indent t)
      (:html :lang "en"
@@ -13,12 +17,12 @@
 	     (:title, title)
 	     (:link :href "/styles.css" :rel "stylesheet")
 	     )
-	    (:body :hx-boost "true"
+	    (:body 
 	     (:nav
 	      (:ul
-	       (:li (:a :href "/" "Star Wars"))
-	       (:li (:a :href "/people" "People"))
-	       (:li (:a :href "/planets" "Planets"))))
+	       (nav-link (:url "/" :active ,active) "Star Wars")
+	       (nav-link (:url "/people" :active ,active) "People")
+	       (nav-link (:url "/planets" :active ,active) "Planets")))
 	     (:main ,@body)
 	     (:script :src "https://unpkg.com/htmx.org@1.4.1")
 	     ))))
@@ -41,6 +45,35 @@
        :hx-indicator ".htmx-indicator")))
     (:div :id "loading-search" :class "htmx-indicator" "Loading...")))
 
+(setq *films* '(("https://swapi.dev/api/films/1/" . "https://m.media-amazon.com/images/M/MV5BYTRhNjcwNWQtMGJmMi00NmQyLWE2YzItODVmMTdjNWI0ZDA2XkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SY999_SX666_AL_.jpg")
+  ("https://swapi.dev/api/films/2/" . "https://m.media-amazon.com/images/M/MV5BMDAzM2M0Y2UtZjRmZi00MzVlLTg4MjEtOTE3NzU5ZDVlMTU5XkEyXkFqcGdeQXVyNDUyOTg3Njg@._V1_SY999_CR0,0,659,999_AL_.jpg")
+  ("https://swapi.dev/api/films/3/" . "https://m.media-amazon.com/images/M/MV5BNTc4MTc3NTQ5OF5BMl5BanBnXkFtZTcwOTg0NjI4NA@@._V1_SY1000_SX750_AL_.jpg")
+  ("https://swapi.dev/api/films/4/" . "https://m.media-amazon.com/images/M/MV5BNzVlY2MwMjktM2E4OS00Y2Y3LWE3ZjctYzhkZGM3YzA1ZWM2XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg")
+  ("https://swapi.dev/api/films/5/" . "https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,641,1000_AL_.jpg")
+  ("https://swapi.dev/api/films/6/" . "https://m.media-amazon.com/images/M/MV5BOWZlMjFiYzgtMTUzNC00Y2IzLTk1NTMtZmNhMTczNTk0ODk1XkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SY999_CR0,0,644,999_AL_.jpg")
+  ("https://swapi.dev/api/films/7/" . "https://m.media-amazon.com/images/M/MV5BOTAzODEzNDAzMl5BMl5BanBnXkFtZTgwMDU1MTgzNzE@._V1_SY1000_CR0,0,677,1000_AL_.jpg")
+  ("https://swapi.dev/api/films/8/" . "https://m.media-amazon.com/images/M/MV5BMjQ1MzcxNjg4N15BMl5BanBnXkFtZTgwNzgwMjY4MzI@._V1_SY1000_CR0,0,675,1000_AL_.jpg")))
+
+(defmacro get-films (films)
+    `(loop for film in ,films 
+	do (cl-who:htm
+	    (:img :width "100" :style "margin:1em;" :src (cdr (assoc film *films* :test #'string=))))))
+
+
+(defmacro get-prop ((key obj))
+    `(cl-who:str (cdr (assoc ,key ,obj))))
+
+(defun format-height (height)
+  (concatenate 'string height " cm (" (write-to-string (* (parse-integer height) 0.0328084)) " ft)"))
+
+(defmacro format-diameter (diameter)
+  `(cl-who:str
+    (concatenate 'string ,diameter " Kilometers (" (write-to-string (* (parse-integer ,diameter) 0.621371)) " Miles)")))
+
+(defun format-population (population)
+  (if (string= "unknown" population)
+      "unknown"
+      (concatenate 'string population " (" (format nil "~r" (parse-integer population)) ")")))
 
 ;; People show page
 (hunchentoot:define-easy-handler (people-show :uri "/people/show") (id)
@@ -50,7 +83,7 @@
 					:method :get
 					)))
 
-  (demo-page (:title "People - Star Wars")
+  (demo-page (:title "People - Star Wars" :active "/people")
 (:div :class "grid"
 	  (:div
 	   :class "left-panel"
@@ -69,9 +102,9 @@
 	   :class "right-panel"
 		(if (assoc :name *character*)
 		    (cl-who:htm
-		     (:h2 (cl-who:str (cdr (assoc :name *character*))))
+		     (:h2 (get-prop (:name *character*)))
 		     (:table
-		      (:tr (:td "Height:") (:td (cl-who:str (cdr (assoc :height *character*)))))
+		      (:tr (:td "Height:") (:td (cl-who:str (format-height (cdr (assoc :height *character*))))))
 		      (:tr (:td "Mass:") (:td (cl-who:str (cdr (assoc :mass *character*)))))
 		      (:tr (:td "Hair Color:") (:td (cl-who:str (cdr (assoc :hair--color *character*)))))
 		      (:tr (:td "Skin Color:") (:td (cl-who:str (cdr (assoc :skin--color *character*)))))
@@ -79,7 +112,7 @@
 		      (:tr (:td "Birth Year:") (:td (cl-who:str (cdr (assoc :birth--year *character*)))))
 		      (:tr (:td "Gender:") (:td (cl-who:str (cdr (assoc :gender *character*)))))
 		      (:tr (:td "Home world:") (:td (cl-who:str (cdr (assoc :home--world *character*)))))
-		      (:tr (:td "Films:") (:td (cl-who:str (cdr (assoc :films *character*)))))
+		      (:tr (:td "Films:") (:td (get-films (cdr (assoc :films *character*)))))
 		      (:tr (:td "Species:") (:td (cl-who:str (cdr (assoc :species *character*)))))
 		      (:tr (:td "Vehicles:") (:td (cl-who:str (cdr (assoc :vehicles *character*)))))
 		      (:tr (:td "Starships:") (:td (cl-who:str (cdr (assoc :starships *character*)))))
@@ -94,7 +127,7 @@
 		   (drakma:http-request "https://swapi.dev/api/people/"
 					:method :get
 					)))
-  (demo-page (:title "People - Star Wars")
+  (demo-page (:title "People - Star Wars" :active "/people")
 (:div :class "grid"
 	  (:div
 	   :class "left-panel"
@@ -123,7 +156,7 @@
 					:method :get
 					)))
 
-  (demo-page (:title "Planets - Star Wars")
+  (demo-page (:title "Planets - Star Wars" :active "/planets")
     (:div :class "grid"
 	  (:div
 	   :class "left-panel"
@@ -143,16 +176,16 @@
 		    (cl-who:htm
 		     (:h2 (cl-who:str (cdr (assoc :name *planet*))))
 		     (:table
-		      (:tr (:td "Diameter:") (:td (cl-who:str (cdr (assoc :diameter *planet*)))))
+		      (:tr (:td "Diameter:") (:td (format-diameter (cdr (assoc :diameter *planet*)))))
 		      (:tr (:td "Rotation Period:") (:td (cl-who:str (cdr (assoc :rotation--period *planet*)))))
 		      (:tr (:td "Orbital Period:") (:td (cl-who:str (cdr (assoc :orbital--period *planet*)))))
 		      (:tr (:td "Gravity:") (:td (cl-who:str (cdr (assoc :gravity *planet*)))))
-		      (:tr (:td "Population:") (:td (cl-who:str (cdr (assoc :population *planet*)))))
+		      (:tr (:td "Population:") (:td (cl-who:str (format-population (cdr (assoc :population *planet*))))))
 		      (:tr (:td "Climate:") (:td (cl-who:str (cdr (assoc :climate *planet*)))))
 		      (:tr (:td "Terrain:") (:td (cl-who:str (cdr (assoc :terrain *planet*)))))
 		      (:tr (:td "Surface Water:") (:td (cl-who:str (cdr (assoc :surface--water *planet*)))))
 		      (:tr (:td "Residents:") (:td (cl-who:str (cdr (assoc :residents *planet*)))))
-		      (:tr (:td "Films:") (:td (cl-who:str (cdr (assoc :films *planet*)))))))
+		      (:tr (:td "Films:") (:td (get-films (cdr (assoc :films *planet*)))))))
 		    (cl-who:htm (:h2 "Please select a planet")))))))
 
 
@@ -164,7 +197,7 @@
 					:method :get
 					)))
 
-  (demo-page (:title "Planets - Star Wars")
+  (demo-page (:title "Planets - Star Wars" :active "/planets")
     (:div :class "grid"
 	  (:div
 	   :class "left-panel"
@@ -184,10 +217,15 @@
 
 ;; Home page
 (hunchentoot:define-easy-handler (root :uri "/") ()
-  (demo-page (:title "Star Wars - Common Lisp demo")
-    (:h1 "Home")
-    (:p "This is a Starwars demo swapi demo")
-    ))
+  (demo-page (:title "Star Wars - Common Lisp demo" :active "/")
+    (:div :class "home-wrapper"
+	(:h1 "Star Wars demo app in Common Lisp")
+	(:p (:a :href "https://github.com/rajasegar/ccl-demo-raja" "Github Source code"))
+	(:p "Built with: ")
+	(:p (:a :href "https://lisp-lang.org" "Common Lisp"))
+	(:p (:a :href "https://htmx.org" "HTMX"))
+	(:p "Server: " (:a :href "https://edicl.github.io/hunchentoot/" "Hunchentoot"))
+	(:p "API: " (:a :href "https://swapi.dev" "SWAPI.dev")))))
 
 ;; Search page - people
 (hunchentoot:define-easy-handler (search-people :uri "/people/search") (search)
