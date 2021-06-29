@@ -96,6 +96,7 @@
 			   do (cl-who:htm
 			       (:li
 				(:a
+				 :class (if (string= id (write-to-string i)) "active" nil)
 				 :href (concatenate 'string "/people/show?id=" (write-to-string i))
 				 (cl-who:str (cdr (assoc :name character)))))))))
 	  (:div
@@ -168,6 +169,7 @@
 			   do (cl-who:htm
 			       (:li
 				(:a
+				 :class (if (string= id (write-to-string i)) "active" nil)
 				 :href (concatenate 'string "/planets/show?id=" (write-to-string i))
 				 (cl-who:str (cdr (assoc :name planet)))))))))
 	  (:div
@@ -268,6 +270,11 @@
 
   (when *acceptor*
     (hunchentoot:stop *acceptor*))
+
+  ;; Checking port numbers with different getenv
+  (format t "uiop => ~a~%" (uiop:getenv "PORT"))
+  (format t "asdf => ~a~%" (asdf:getenv "PORT"))
+  (format t "ccl => ~a~%" (ccl:getenv "PORT"))
 
   (setf *acceptor*
     (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port port))))
