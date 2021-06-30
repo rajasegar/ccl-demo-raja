@@ -1,12 +1,11 @@
 (in-package :ccl-demo-raja)
 
 ;; People show page
-(hunchentoot:define-easy-handler (people-show :uri "/people/show") (id)
+(defun people-show-page ()
 
-  (let ((person (decode-json-from-string
-		     (drakma:http-request (concatenate 'string "https://swapi.dev/api/people/" id)
-					  :method :get
-					  ))))
+  (let ((person (cl-json:decode-json-from-string
+		     (drakma:http-request (concatenate 'string "https://swapi.dev/api/people/" (get-id-from-uri))
+					  :method :get))))
   (format t "~a~%" person)
 
   (demo-page (:title "People - Star Wars" :active "/people")
@@ -22,8 +21,8 @@
 		  do (htm
 		      (:li
 		       (:a
-			:class (if (string= id (write-to-string i)) "active" nil)
-			:href (concatenate 'string "/people/show?id=" (write-to-string i))
+			:class (if (string= (get-id-from-uri) (write-to-string i)) "active" nil)
+			:href (concatenate 'string "/people/" (write-to-string i))
 			(str (cdr (assoc :name character)))))))))
 	  (:div
 	   :class "right-panel"

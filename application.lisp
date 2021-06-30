@@ -5,31 +5,26 @@
 (setf drakma:*header-stream* *standard-output*)
 
 ;; Publish all static content.
-(push (hunchentoot:create-static-file-dispatcher-and-handler "/styles.css"  (asdf:system-relative-pathname 'ccl-demo-raja "static/styles.css")) hunchentoot:*dispatch-table*)
-(push (hunchentoot:create-static-file-dispatcher-and-handler "/lisp-logo120x80.png"  (asdf:system-relative-pathname 'ccl-demo-raja "static/lisp-logo120x80.png")) hunchentoot:*dispatch-table*)
+(setq *dispatch-table*
+      (list
+       (create-regex-dispatcher "^/$" 'home-page)
+       (create-regex-dispatcher "^/planets$" 'planets-page)
+       (create-regex-dispatcher "^/planets/search$" 'planets-search-page)
+       (create-regex-dispatcher "^/planets/[0-9]+$" 'planets-show-page)
+       (create-regex-dispatcher "^/people$" 'people-page)
+       (create-regex-dispatcher "^/people/search$" 'people-search-page)
+       (create-regex-dispatcher "^/people/[0-9]+$" 'people-show-page)
+       (create-static-file-dispatcher-and-handler "/styles.css"  "static/styles.css")
+       (create-static-file-dispatcher-and-handler "/lisp-logo120x80.png"  "static/lisp-logo120x80.png")))
+
+
+(defun get-id-from-uri ()
+  "Returns the ID from the URI request."
+  (car (cl-ppcre:all-matches-as-strings "[0-9]+" (request-uri *request*))))
 
 (defmacro nav-link ((&key url active) &body body)
   `(cl-who:htm
     (:li (:a :href ,url :class (if (string= ,active ,url) "active" nil) ,@body))))
-
-(defmacro demo-page ((&key title active) &body body)
-  `(cl-who:with-html-output-to-string
-       (*standard-output* nil :prologue t :indent t)
-     (:html :lang "en"
-	    (:head
-	     (:meta :charset "utf-8")
-	     (:title, title)
-	     (:link :href "/styles.css" :rel "stylesheet")
-	     )
-	    (:body 
-	     (:nav
-	      (:ul
-	       (nav-link (:url "/" :active ,active) "Star Wars")
-	       (nav-link (:url "/people" :active ,active) "People")
-	       (nav-link (:url "/planets" :active ,active) "Planets")))
-	     (:main ,@body)
-	     (:script :src "https://unpkg.com/htmx.org@1.4.1")
-	     ))))
 
 (defmacro search-box ((&key url))
   `(cl-who:htm
@@ -83,7 +78,7 @@
   `(let ((homeworld (cl-json:decode-json-from-string
 		    (drakma:http-request ,url :method :get))))
      (cl-who:htm (:a
-		  :href (concatenate 'string "/planets/show?id=" (cl-ppcre:scan-to-strings "[0-9]+" ,url))
+		  :href (concatenate 'string "/planets/" (cl-ppcre:scan-to-strings "[0-9]+" ,url))
 		  (cl-who:str (cdr (assoc :name homeworld)))))))
 
 

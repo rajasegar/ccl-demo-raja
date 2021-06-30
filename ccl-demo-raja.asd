@@ -10,7 +10,8 @@
 	       (:file "main")
 	       (:module :views
 		:serial t
-		:components ((:file "home")
+		:components ((:file "layout")
+			     (:file "home")
 			     (:file "people")
 			     (:file "people-show")
 			     (:file "people-search")

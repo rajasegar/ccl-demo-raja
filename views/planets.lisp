@@ -1,12 +1,11 @@
 (in-package :ccl-demo-raja)
 
 ;; Planets page
-(hunchentoot:define-easy-handler (planets :uri "/planets") ()
+(defun planets-page ()
   
-  (setq *planets* (decode-json-from-string
+  (setq *planets* (cl-json:decode-json-from-string
 		   (drakma:http-request "https://swapi.dev/api/planets/"
-					:method :get
-					)))
+					:method :get)))
 
   (demo-page (:title "Planets - Star Wars" :active "/planets")
     (:div :class "grid"
@@ -20,7 +19,7 @@
 		      do (htm
 			  (:li
 			   (:a
-			    :href (concatenate 'string "/planets/show?id=" (write-to-string i))
+			    :href (concatenate 'string "/planets/" (write-to-string i))
 			    (str (cdr (assoc :name planet)))))))))
 	  (:div
 	   :class "right-panel"

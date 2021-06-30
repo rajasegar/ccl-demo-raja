@@ -1,7 +1,7 @@
 (in-package :ccl-demo-raja)
 
 ;; Home page
-(hunchentoot:define-easy-handler (root :uri "/") ()
+(defun home-page ()
   (demo-page (:title "Star Wars - Common Lisp demo" :active "/")
     (:div :class "home-wrapper"
 	  (:h1 "Star Wars demo app in Common Lisp")
