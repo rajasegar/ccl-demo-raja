@@ -1,3 +1,5 @@
+(in-package :ccl-demo-raja)
+
 ;; Planets show page
 (hunchentoot:define-easy-handler (planets-show :uri "/planets/show") (id)
   (format t "ID: ~a~%" id)

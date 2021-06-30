@@ -1,10 +1,10 @@
 (in-package :ccl-demo-raja)
 
 ;; Planets page
-(define-easy-handler (planets :uri "/planets") ()
+(hunchentoot:define-easy-handler (planets :uri "/planets") ()
   
   (setq *planets* (decode-json-from-string
-		   (http-request "https://swapi.dev/api/planets/"
+		   (drakma:http-request "https://swapi.dev/api/planets/"
 					:method :get
 					)))
 

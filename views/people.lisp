@@ -1,10 +1,10 @@
 (in-package :ccl-demo-raja)
 
 ;; People page
-(define-easy-handler (people :uri "/people") ()
+(hunchentoot:define-easy-handler (people :uri "/people") ()
 
   (setq *people* (decode-json-from-string
-		  (http-request "https://swapi.dev/api/people/"
+		  (drakma:http-request "https://swapi.dev/api/people/"
 				       :method :get
 				       )))
   (demo-page (:title "People - Star Wars" :active "/people")
