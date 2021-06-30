@@ -36,6 +36,6 @@
 		   (:tr (:td "Climate:") (:td (str (cdr (assoc :climate planet)))))
 		   (:tr (:td "Terrain:") (:td (str (cdr (assoc :terrain planet)))))
 		   (:tr (:td "Surface Water:") (:td (str (cdr (assoc :surface--water planet)))))
-		   (:tr (:td "Residents:") (:td (str (cdr (assoc :residents planet)))))
+		   (:tr (:td "Residents:") (:td (get-residents (cdr (assoc :residents planet)))))
 		   (:tr (:td "Films:") (:td (get-films (cdr (assoc :films planet)))))))
 		 (htm (:h2 "Please select a planet"))))))))

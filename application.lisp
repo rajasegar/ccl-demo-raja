@@ -23,11 +23,11 @@
   (car (cl-ppcre:all-matches-as-strings "[0-9]+" (request-uri *request*))))
 
 (defmacro nav-link ((&key url active) &body body)
-  `(cl-who:htm
+  `(htm
     (:li (:a :href ,url :class (if (string= ,active ,url) "active" nil) ,@body))))
 
 (defmacro search-box ((&key url))
-  `(cl-who:htm
+  `(htm
     (:div
      :class "search-wrapper"
      (:label :for "search-box" "Search:")
@@ -55,18 +55,18 @@
 
 (defmacro get-films (films)
   `(loop for film in ,films 
-	 do (cl-who:htm
+	 do (htm
 	     (:img :width "100" :style "margin:1em;" :src (cdr (assoc film *films* :test #'string=))))))
 
 
 (defmacro get-prop ((key obj))
-  `(cl-who:str (cdr (assoc ,key ,obj))))
+  `(str (cdr (assoc ,key ,obj))))
 
 (defun format-height (height)
   (concatenate 'string height " cm (" (write-to-string (* (parse-integer height) 0.0328084)) " ft)"))
 
 (defmacro format-diameter (diameter)
-  `(cl-who:str
+  `(str
     (concatenate 'string ,diameter " Kilometers (" (write-to-string (* (parse-integer ,diameter) 0.621371)) " Miles)")))
 
 (defun format-population (population)
@@ -76,12 +76,37 @@
 
 (defmacro home-world (url)
   `(let ((homeworld (cl-json:decode-json-from-string
-		    (drakma:http-request ,url :method :get))))
-     (cl-who:htm (:a
-		  :href (concatenate 'string "/planets/" (cl-ppcre:scan-to-strings "[0-9]+" ,url))
-		  (cl-who:str (cdr (assoc :name homeworld)))))))
+		     (drakma:http-request ,url :method :get))))
+     (htm (:a
+	   :href (concatenate 'string "/planets/" (cl-ppcre:scan-to-strings "[0-9]+" ,url))
+	   (str (cdr (assoc :name homeworld)))))))
 
+(defmacro get-vehicle-names (vehicles)
+  `(loop for url in ,vehicles
+	 do (let ((vehicle (cl-json:decode-json-from-string
+			    (drakma:http-request url :method :get))))
+	    (htm (:p (str (cdr (assoc :name vehicle))))))))
 
+(defmacro get-starships (starships)
+  `(loop for url in ,starships
+	 do (let ((ship (cl-json:decode-json-from-string
+			    (drakma:http-request url :method :get))))
+	    (htm (:p (str (cdr (assoc :name ship))))))))
+
+(defmacro get-species (species)
+  `(loop for url in ,species
+	 do (let ((spec (cl-json:decode-json-from-string
+			    (drakma:http-request url :method :get))))
+	    (htm (:p (str (cdr (assoc :name spec))))))))
+
+(defmacro get-residents (residents)
+  `(loop for url in ,residents
+	 do (let ((resident (cl-json:decode-json-from-string
+			    (drakma:http-request url :method :get))))
+	      (htm
+	       (:p
+		(:a
+		 :href (concatenate 'string "/people/" (cl-ppcre:scan-to-strings "[0-9]+" (cdr (assoc :url resident)))) (str (cdr (assoc :name resident)))))))))
 
 
 
