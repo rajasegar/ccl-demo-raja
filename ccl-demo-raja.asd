@@ -6,4 +6,9 @@
   :serial t
   :depends-on (#:hunchentoot #:cl-who #:cl-json #:drakma #:cl-ppcre)
   :components ((:file "package")
-               (:file "application")))
+               (:file "application")
+	       (:file "main")
+	       (:module :views
+		:serial t
+		:components ((:file "home")
+			     (:file "people")))))
