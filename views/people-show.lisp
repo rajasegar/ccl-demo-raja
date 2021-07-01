@@ -40,7 +40,7 @@
 		 (:tr (:td "Home world:") (:td (home-world (cdr (assoc :homeworld person)))))
 		 (:tr (:td "Films:") (:td (get-films (cdr (assoc :films person)))))
 		 (:tr (:td "Species:") (:td (get-species (cdr (assoc :species person)))))
-		 (:tr (:td "Vehicles:") (:td (get-vehicle-names (cdr (assoc :vehicles person)))))
+		 (:tr (:td "Vehicles:") (:td (get-vehicles (cdr (assoc :vehicles person)))))
 		 (:tr (:td "Starships:") (:td (get-starships (cdr (assoc :starships person)))))))
 	       (htm (:h2 "Please select a character"))))))))
 

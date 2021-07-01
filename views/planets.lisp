@@ -12,15 +12,7 @@
 	  (:div
 	   :class "left-panel"
 	   (search-box (:url "/planets/search"))
-	   (:ul :id "search-results"
-		:class "list"
-		(loop for planet in (rest (assoc :results *planets*))
-		      for i from 1 to 10
-		      do (htm
-			  (:li
-			   (:a
-			    :href (concatenate 'string "/planets/" (write-to-string i))
-			    (str (cdr (assoc :name planet)))))))))
+	   (list-component (rest (assoc :results *planets*)) "/planets/" :name))
 	  (:div
 	   :class "right-panel"
 	   (:h2 "Please select a planet.")))))

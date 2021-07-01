@@ -1,32 +1,16 @@
 (in-package :ccl-demo-raja)
 
-;; Config drakma
-(push (cons "application" "json") drakma:*text-content-types*)
-(setf drakma:*header-stream* *standard-output*)
-
-;; Publish all static content.
-(setq *dispatch-table*
-      (list
-       (create-regex-dispatcher "^/$" 'home-page)
-       (create-regex-dispatcher "^/planets$" 'planets-page)
-       (create-regex-dispatcher "^/planets/search$" 'planets-search-page)
-       (create-regex-dispatcher "^/planets/[0-9]+$" 'planets-show-page)
-       (create-regex-dispatcher "^/people$" 'people-page)
-       (create-regex-dispatcher "^/people/search$" 'people-search-page)
-       (create-regex-dispatcher "^/people/[0-9]+$" 'people-show-page)
-       (create-static-file-dispatcher-and-handler "/styles.css"  "static/styles.css")
-       (create-static-file-dispatcher-and-handler "/lisp-logo120x80.png"  "static/lisp-logo120x80.png")))
-
-
 (defun get-id-from-uri ()
   "Returns the ID from the URI request."
   (car (cl-ppcre:all-matches-as-strings "[0-9]+" (request-uri *request*))))
 
 (defmacro nav-link ((&key url active) &body body)
+  "Nav link component"
   `(htm
     (:li (:a :href ,url :class (if (string= ,active ,url) "active" nil) ,@body))))
 
 (defmacro search-box ((&key url))
+  "Search box component"
   `(htm
     (:div
      :class "search-wrapper"
@@ -69,45 +53,60 @@
   `(str
     (concatenate 'string ,diameter " Kilometers (" (write-to-string (* (parse-integer ,diameter) 0.621371)) " Miles)")))
 
-(defun format-population (population)
-  (if (string= "unknown" population)
+(defmacro format-number (n)
+  `(str (if (string= "unknown" ,n)
       "unknown"
-      (concatenate 'string population " (" (format nil "~r" (parse-integer population)) ")")))
+      (concatenate 'string ,n " (" (format nil "~r" (parse-integer ,n)) ")"))))
 
 (defmacro home-world (url)
-  `(let ((homeworld (cl-json:decode-json-from-string
-		     (drakma:http-request ,url :method :get))))
-     (htm (:a
+  `(htm (:a
+	   :_ (concatenate 'string "on load fetch " ,url " as json put it.name into my.innerHTML") 
 	   :href (concatenate 'string "/planets/" (cl-ppcre:scan-to-strings "[0-9]+" ,url))
-	   (str (cdr (assoc :name homeworld)))))))
+	   "Loading...")))
 
-(defmacro get-vehicle-names (vehicles)
+(defmacro get-vehicles (vehicles)
   `(loop for url in ,vehicles
-	 do (let ((vehicle (cl-json:decode-json-from-string
-			    (drakma:http-request url :method :get))))
-	    (htm (:p (str (cdr (assoc :name vehicle))))))))
+	 do (htm
+	       (:p
+		(:a
+		 :_ (concatenate 'string "on load fetch " url " as json put it.name into my.innerHTML") 
+		 :href (concatenate 'string "/vehicles/" (cl-ppcre:scan-to-strings "[0-9]+" url)) "Loading...")))))
 
 (defmacro get-starships (starships)
   `(loop for url in ,starships
-	 do (let ((ship (cl-json:decode-json-from-string
-			    (drakma:http-request url :method :get))))
-	    (htm (:p (str (cdr (assoc :name ship))))))))
+	 do (htm
+	       (:p
+		(:a
+		 :_ (concatenate 'string "on load fetch " url " as json put it.name into my.innerHTML") 
+		 :href (concatenate 'string "/starships/" (cl-ppcre:scan-to-strings "[0-9]+" url)) "Loading...")))))
 
 (defmacro get-species (species)
   `(loop for url in ,species
-	 do (let ((spec (cl-json:decode-json-from-string
-			    (drakma:http-request url :method :get))))
-	    (htm (:p (str (cdr (assoc :name spec))))))))
-
-(defmacro get-residents (residents)
-  `(loop for url in ,residents
-	 do (let ((resident (cl-json:decode-json-from-string
-			    (drakma:http-request url :method :get))))
-	      (htm
+	 do (htm
 	       (:p
 		(:a
-		 :href (concatenate 'string "/people/" (cl-ppcre:scan-to-strings "[0-9]+" (cdr (assoc :url resident)))) (str (cdr (assoc :name resident)))))))))
+		 :_ (concatenate 'string "on load fetch " url " as json put it.name into my.innerHTML") 
+		 :href (concatenate 'string "/species/" (cl-ppcre:scan-to-strings "[0-9]+" url)) "Loading...")))))
 
 
 
+(defmacro get-people (people)
+  `(loop for url in ,people
+	 do (htm
+	       (:p
+		(:a
+		 :_ (concatenate 'string "on load fetch " url " as json put it.name into my.innerHTML") 
+		 :href (concatenate 'string "/people/" (cl-ppcre:scan-to-strings "[0-9]+" url)) "Loading...")))))
 
+(defmacro list-component (items url name)
+  `(htm (:ul :id "search-results"
+	     :class "list"
+	     (loop for item in ,items
+		   do 
+		      (let ((id (cl-ppcre:scan-to-strings "[0-9]+" (cdr (assoc :url item)))))
+			(htm
+			 (:li
+			  (:a
+			   :class (if (string= (get-id-from-uri) id) "active" nil)
+			   :href (concatenate 'string ,url id)
+			   (str (cdr (assoc ,name item)))))))))))

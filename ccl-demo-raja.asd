@@ -6,15 +6,23 @@
   :serial t
   :depends-on (#:hunchentoot #:cl-who #:cl-json #:drakma #:cl-ppcre)
   :components ((:file "package")
-               (:file "application")
+               (:file "config")
 	       (:file "main")
+	       (:module :src
+		:serial t
+		:components ((:file "controllers")
+			     (:file "utils")))
 	       (:module :views
 		:serial t
 		:components ((:file "layout")
 			     (:file "home")
 			     (:file "people")
 			     (:file "people-show")
-			     (:file "people-search")
 			     (:file "planets")
 			     (:file "planets-show")
-			     (:file "planets-search")))))
+			     (:file "vehicles")
+			     (:file "vehicles-show")
+			     (:file "starships")
+			     (:file "starships-show")
+			     (:file "films")
+			     (:file "films-show")))))

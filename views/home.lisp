@@ -9,6 +9,7 @@
 	  (:p "Built with: ")
 	  (:p (:a :href "https://lisp-lang.org" "Common Lisp"))
 	  (:p (:a :href "https://htmx.org" "HTMX"))
+	  (:p (:a :href "https://hyperscript.org" "hyperscript"))
 	  (:p "Server: " (:a :href "https://edicl.github.io/hunchentoot/" "Hunchentoot"))
 	  (:p "API: " (:a :href "https://swapi.dev" "SWAPI.dev"))
 	  (:p (:img :src "lisp-logo120x80.png")))))
